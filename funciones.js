@@ -243,7 +243,11 @@ function municiones() {
 	ctx.fillText("Municion: " + municion, 10, 40);
 	ctx.restore();
 }
-function verifica() {
+function verifica(boton=false, codigo=0) {
+	if(boton){
+		teclaPulsada = codigo;
+		tecla[codigo] = true;
+	}
 	if (tecla[teclaDerecha]) x += 5;
 	if (tecla[teclaIzquierda]) x -= 5;
 	//Verifica cañon
@@ -259,6 +263,11 @@ function verifica() {
 			disparaEnemigo();
 			setTimeout(function(){tiempoBala = true;}, 300);
 		}
+	}
+	if(boton){
+		setTimeout(() => {
+			tecla[codigo] = false;
+		}, 100);
 	}
 }
 function checarBalas(){

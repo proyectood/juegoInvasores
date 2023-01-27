@@ -70,6 +70,7 @@ var endGame = false;
 var disparoEnemigo;
 var tiempoDisparo = 500;
 var puntos = 0;
+var sinMunicion = false;
 /*****************
 OBJETOS
 ******************/
@@ -103,8 +104,6 @@ function nave(x) {
 			ctx.drawImage(imgNave,0   , 0   , 32  , 32  , this.x, this.y, 35  , 35);
 			imgAni2 = imgAni2 + 1;
 			imgAni = imgAni + 1;
-			checarBalas();
-			//setInterval(checarBalas(),1000);
 		} else if(imgAni2 < 10) {
 			ctx.drawImage(imgNave,32  , 0   , 32  , 32  , this.x, this.y, 35  , 35);
 			imgAni2 = imgAni2 + 1;
@@ -180,7 +179,7 @@ function mensaje(cadena) {
 	ctx.fillStyle = "white";
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.font = "bold 75px Arial";
-	ctx.fillText(cadena, lon, 220);
+	ctx.fillText(cadena, (lon == 0 ? 40 : lon ), 220);
 }
 function colisiones() {
 	for (var i = 0; i < ovnis_array.length; i++) {
@@ -222,8 +221,21 @@ function gameOver() {
 	if( enemigosVivos == 0 ){
 		mensaje("GANASTE");
 	}else{
-		mensaje("GAME OVER");
+		if(sinMunicion){
+			mensaje("SIN MUNICION");
+			setTimeout(() => { mensaje("GAME OVER"); }, 2000);
+		}else{
+			mensaje("GAME OVER");
+		}
 	}
+	let botonesJuego = document.querySelectorAll(".botonesMover, .botonDisparo");
+	botonesJuego.forEach(function(e) {
+		e.style.display = "none";
+	});
+	let botonReinicio = document.querySelectorAll(".botonReiniciar");
+	botonReinicio.forEach(function(e) {
+		e.style.display = "block";
+	});
 	endGame = true;
 	clearTimeout(disparoEnemigo);
 }
@@ -240,7 +252,7 @@ function municiones() {
 	ctx.fillStyle = "white";
 	ctx.clearRect(0, 20, canvas.width, 20);
 	ctx.font = "bold 12px Courier";
-	ctx.fillText("Municion: " + municion, 10, 40);
+	ctx.fillText("Municion: " + (sinMunicion ? 'Sin municion.' : municion), 10, 40);
 	ctx.restore();
 }
 function verifica(boton=false, codigo=0) {
@@ -260,8 +272,12 @@ function verifica(boton=false, codigo=0) {
 			balas_array.push(new Bala(nave.x + 12, nave.y - 3, 5));
 			(municion >0)?municion = municion - 1 : false;
 			tecla[teclaEspacio] = false;
+			// aqui se agrega el sonido del disparo de nuestra nave
+			let audioDisparo = new Audio("sonidos/disparo.mp3");
+    		audioDisparo.play();
 			disparaEnemigo();
 			setTimeout(function(){tiempoBala = true;}, 300);
+			setTimeout(function(){checarBalas();}, 2000)
 		}
 	}
 	if(boton){
@@ -279,8 +295,8 @@ function checarBalas(){
 	}
 	if(municion == 0 && balas_array.length == 100 && balasArrayVal == 0 && enemigosVivos > 0){
 		tecla[teclaEspacio] = false;
-			alert("Sin municion");
-			gameOver();
+		sinMunicion = true;
+		setTimeout(() => { gameOver(); }, 1000);
 	}
 }
 function pinta() {
@@ -338,4 +354,7 @@ function disparaEnemigo() {
 	balasEnemigas_array.push(new Bala(ovnis_array[d].x + ovnis_array[d].w / 2, ovnis_array[d].y, 5));
 	clearTimeout(disparoEnemigo);
 	disparoEnemigo = setTimeout(disparaEnemigo, tiempoDisparo);
+}
+function reiniciar(){
+	location.reload();
 }

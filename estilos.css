@@ -30,3 +30,14 @@ h1 {
     font-size: 14px;
     font-weight: bold;
 }
+.botonReiniciar{
+    color: #e8e8e8;
+    background-color: #169300;
+    border-radius: 10px;
+    height: 30px;
+    width: 25%;
+    margin: 1% auto;
+    font-size: 14px;
+    font-weight: bold;
+    display: none;
+}
